@@ -6,8 +6,22 @@
   background-color: white;
 }
 
-.App h1 {
+.App h1, .App h5 {
   color: grey;
+}
+
+.App h1 {
+  margin-bottom: 10px;
+}
+
+.App h5 {
+  margin-top: 0;
+  font-weight: 500;
+}
+
+.App h5 > span {
+  font-weight: 700;
+  font-size: 20px;
 }
 
 .trello-lists-container {
