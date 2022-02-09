@@ -1,0 +1,35 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  background-color: white;
+}
+
+.App h1 {
+  color: grey;
+}
+
+.trello-lists-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.trello-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.trello-list > h1 {
+  font-size: 20px;
+}
+
+.trello-list > h1 > span {
+  opacity: 0.6;
+}
+
+.red-outline {
+  border: 5px rgba(255, 12, 12, 0.589) solid;
+}
