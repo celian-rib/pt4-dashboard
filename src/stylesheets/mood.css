@@ -1,0 +1,27 @@
+.team-mood-container {
+    width: 70%;
+    height: 100px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.mood-container {
+    min-width: 30px;
+    height: 30px;
+    border: solid grey 2px;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 2px 12px;
+}
+
+.mood-container > select {
+    border: none;
+    padding: 0 10px;
+    width: 70px;
+    font-size: 25px;
+}
