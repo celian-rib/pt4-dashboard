@@ -85,7 +85,7 @@ function CardTrello(props) {
               <p><span>Leadtime : </span>{leadtime ?? '--'}</p>
             </div>
             <div className='card-info-slot'>
-              <p style={{ marginTop: 0 }}><span>Côut horaire : </span>{9}</p>
+              <p style={{ marginTop: 0 }}><span>Côut horaire : </span>{9}h<img src={require('../editing.png')} className='edit-button' /></p>
               <p style={{ marginTop: 0 }}><span>Estimé : </span>{8}h</p>
             </div>
           </>
