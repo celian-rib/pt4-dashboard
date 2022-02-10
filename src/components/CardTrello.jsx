@@ -4,7 +4,7 @@ import ToolTips from './ToolTip';
 
 import trello from '../trello';
 import { useGlobal } from 'reactn';
-import { collection, doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 const dateFormat = {
   weekday: "long",
