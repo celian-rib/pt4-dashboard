@@ -87,7 +87,7 @@ function TrelloTasks(props) {
       {(weekEnd >= new Date()) && ( // Display waiting/in progress only for current and future weeks
         <>
           <div className='trello-list-slot'>
-            <h1>Tâches en attente
+            <h1>Tâches à faire
               <span> ({weekWaitingCards.length}/{totalCards()})</span>
             </h1>
             <div className='trello-list'>

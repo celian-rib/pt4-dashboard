@@ -6,6 +6,8 @@ import trello from '../trello';
 import { useGlobal } from 'reactn';
 import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
+import { toast } from 'react-toastify';
+
 const dateFormat = {
   weekday: "long",
   month: "long",
@@ -121,6 +123,7 @@ function CardTrello(props) {
     if (Number.isNaN(nbHour))
       return;
     setHourlyCost(nbHour);
+    toast.success('Tâche mise à jour !');
   }
 
   const changeEstimatedHourlyCost = () => {
@@ -128,6 +131,7 @@ function CardTrello(props) {
     if (Number.isNaN(nbHour))
       return;
     setEstimatedHourlyCost(nbHour);
+    toast.success('Tâche mise à jour !');
   }
 
   return (

@@ -1,10 +1,10 @@
+import { useCallback, useState, useEffect } from 'react';
+
 import '../stylesheets/mood.css';
 import { useGlobal } from 'reactn';
-import { collection, doc, setDoc, getDoc, getDocs } from "firebase/firestore";
-import { useMemo } from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { collection, doc, setDoc, getDocs } from "firebase/firestore";
 
+import { toast } from 'react-toastify';
 
 const members = ['ruben', 'gael', 'emillien', 'hugo', 'celian'];
 
@@ -26,26 +26,38 @@ function TeamMood(props) {
   const { weekStart, weekEnd } = props;
 
   const getMoodId = (index) => {
+    if (weekStart == undefined)
+      return undefined;
     const date = new Date(weekStart.toLocaleDateString('FR'));
+    if(Number.isNaN(date.getTime()))
+      return undefined;
     return members[index] + '|' + date.getTime();
   }
 
   const moodUpdated = (index, value) => {
     const cardsRef = collection(db, 'moods');
     const moodId = getMoodId(index);
+    if (moodId == undefined)
+      return;
     setDoc(doc(cardsRef, moodId), {
       name: members[index],
       mood: value,
       moodId
     });
+    setWeekMoods(old => [...old, {
+      name: members[index],
+      mood: value,
+      moodId
+    }])
+    toast.success('Humeur mise à jour !');
   };
 
   useEffect(() => {
-    setWeekMoods(undefined);
     getThisWeekMoods();
   }, [db, weekStart]);
 
   const getThisWeekMoods = async () => {
+    setWeekMoods(undefined);
     if (db == undefined)
       return;
     const result = await getDocs(collection(db, 'moods'))
@@ -57,7 +69,7 @@ function TeamMood(props) {
   }
 
   const borderStyle = (index) => {
-    const setMood = weekMoods.find(m => m.moodId === getMoodId(index))?.mood;
+    const setMood = weekMoods?.find(m => m.moodId === getMoodId(index))?.mood;
     if (setMood === '⌛' || setMood == undefined)
       return { borderColor: '#d45950' };
     return {};
@@ -68,14 +80,14 @@ function TeamMood(props) {
 
   return (
     <div className="team-mood-container">
-      {members.map((member, index) => (
-        <div style={borderStyle(index)} key={index} className='mood-container'>{membersDisplayName[member]}
+      {members.map((member, memberIndex) => (
+        <div style={borderStyle(memberIndex)} key={memberIndex} className='mood-container'>{membersDisplayName[member]}
           <select
             option={moods}
-            onChange={(value) => moodUpdated(index, value.target.value)}
-            defaultValue={weekMoods.find(m => m.moodId === getMoodId(index))?.mood}
+            onChange={(value) => moodUpdated(memberIndex, value.target.value)}
+            defaultValue={weekMoods?.find(m => m.moodId === getMoodId(memberIndex))?.mood}
           >
-            {moods.map((mood, index) => (
+            {moods?.map((mood, index) => (
               <option key={index} value={mood}>
                 {mood}
               </option>
