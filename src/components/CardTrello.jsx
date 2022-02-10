@@ -6,6 +6,14 @@ import trello from '../trello';
 import { useGlobal } from 'reactn';
 import { collection, doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
 
+const dateFormat = {
+  weekday: "long",
+  month: "long",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit"
+};
+
 const getColor = (colorName) => {
   switch (colorName) {
     case 'red':
@@ -64,9 +72,9 @@ function CardTrello(props) {
   }, [cardData]);
 
   const cardIssue = useMemo(() => {
-    const errorStyle = { borderColor: 'red', borderWidth: 5, borderStyle: "solid" };
+    const errorStyle = { borderColor: '#d45950', borderWidth: 5, borderStyle: "solid" };
     if (cardData?.idList === trello.DONE_LIST_ID && (estimatedHourlyCost == null || hourlyCost == null))
-      return ['Information sur les horaire manquante(s)', errorStyle];
+      return ['Information sur les horaires manquante(s)', errorStyle];
     if (cardData?.idList === trello.IN_PROGRESS_LIST_ID && estimatedHourlyCost == null)
       return ['Estimation du temps de réalisation manquante', errorStyle];
     if (cardData?.members.length === 0)
@@ -116,7 +124,7 @@ function CardTrello(props) {
   }
 
   const changeEstimatedHourlyCost = () => {
-    const nbHour = prompt('Entrer estimation du temps demandé par cette tâche');
+    const nbHour = prompt('Estimation du temps demandé par cette tâche');
     if (Number.isNaN(nbHour))
       return;
     setEstimatedHourlyCost(nbHour);
@@ -134,15 +142,15 @@ function CardTrello(props) {
         <a href={cardData.shortUrl}>{cardData.name}</a>
         {showStats != undefined && (
           <div className='card-info-slot'>
-            <p><span>Date de début : </span>{startDate?.toLocaleString("FR") ?? 'Non connue'}</p>
-            <p><span>Date de fin : </span>{doneDate?.toLocaleString("FR") ?? 'Non connue'}</p>
+            <p><span>Date de début : </span>{startDate?.toLocaleString("FR", dateFormat) ?? 'Non connue'}</p>
+            <p><span>Date de fin : </span>{doneDate?.toLocaleString("FR", dateFormat) ?? 'Non connue'}</p>
             <p><span>Leadtime : </span>{leadtime ?? '--'}</p>
           </div>
         )}
         {showTimeInfos != undefined && (
           <div className='card-info-slot'>
             {showStats && (
-              <p onClick={changeHourlyCost} style={{ marginTop: 0 }}><span>Côut horaire : </span>{hourlyCost ?? '-- '}h
+              <p onClick={changeHourlyCost} style={{ marginTop: 0 }}><span>Coût horaire : </span>{hourlyCost ?? '-- '}h
                 <img src={require('../editing.png')} className='edit-button' />
               </p>
             )}
