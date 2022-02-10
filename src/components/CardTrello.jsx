@@ -3,6 +3,8 @@ import '../stylesheets/trelloCard.css';
 import ToolTips from './ToolTip';
 
 import trello from '../trello';
+import { useGlobal } from 'reactn';
+import { collection, doc, setDoc, getFirestore, getDoc } from "firebase/firestore";
 
 const getColor = (colorName) => {
   switch (colorName) {
@@ -26,12 +28,51 @@ const getColor = (colorName) => {
 }
 
 function CardTrello(props) {
-  const { cardData, showStats, actions = [] } = props;
+  const { cardData, showStats, showTimeInfos, actions = [] } = props;
 
-  const getIssueStyle = () => {
-    if (cardData.members.length === 0)
-      return { borderColor: '#3e8ccc', borderWidth: 5, borderStyle: "solid" }
-  }
+  const [db] = useGlobal('firebase');
+  const [estimatedHourlyCost, setEstimatedHourlyCost] = useState(undefined);
+  const [hourlyCost, setHourlyCost] = useState(undefined);
+  const [init, setInit] = useState(false);
+
+  useEffect(() => {
+    if (cardData == undefined || init == false)
+      return;
+    const cardsRef = collection(db, "cards");
+    setDoc(doc(cardsRef, cardData.id), {
+      name: cardData.name,
+      isDone: isDone,
+      creationDate: creationDate,
+      startDate: startDate ?? null,
+      doneDate: doneDate ?? null,
+      leadtime: leadtime ?? null,
+      hourlyCost: hourlyCost ?? null,
+      estimatedHourlyCost: estimatedHourlyCost ?? null
+    });
+  }, [init, hourlyCost, estimatedHourlyCost]);
+
+  useEffect(() => {
+    if (cardData == undefined)
+      return;
+    const cardsRef = collection(db, "cards");
+    getDoc(doc(cardsRef, cardData.id)).then(fbData => {
+      const data = fbData.data();
+      setEstimatedHourlyCost(data.estimatedHourlyCost);
+      setHourlyCost(data.hourlyCost);
+      setInit(true);
+    });
+  }, [cardData]);
+
+  const cardIssue = useMemo(() => {
+    const errorStyle = { borderColor: 'red', borderWidth: 5, borderStyle: "solid" };
+    if (cardData?.idList === trello.DONE_LIST_ID && (estimatedHourlyCost == null || hourlyCost == null))
+      return ['Information sur les horaire manquante(s)', errorStyle];
+    if (cardData?.idList === trello.IN_PROGRESS_LIST_ID && estimatedHourlyCost == null)
+      return ['Estimation du temps de réalisation manquante', errorStyle];
+    if (cardData?.members.length === 0)
+      return ['Aucun membre n\'est affecté à cette carte', { borderColor: '#3e8ccc', borderWidth: 5, borderStyle: "solid" }]
+    return [undefined, undefined]
+  }, [cardData, estimatedHourlyCost, hourlyCost]);
 
   const isDone = useMemo(() => {
     return actions[0]?.data?.listAfter?.id === trello.DONE_LIST_ID
@@ -67,28 +108,48 @@ function CardTrello(props) {
     return `${days} jours`;
   }, [doneDate, startDate]);
 
+  const changeHourlyCost = () => {
+    const nbHour = prompt('Entrer nombre d\'heures réalisées');
+    if (Number.isNaN(nbHour))
+      return;
+    setHourlyCost(nbHour);
+  }
+
+  const changeEstimatedHourlyCost = () => {
+    const nbHour = prompt('Entrer estimation du temps demandé par cette tâche');
+    if (Number.isNaN(nbHour))
+      return;
+    setEstimatedHourlyCost(nbHour);
+  }
+
   return (
-    <div onClick={openCardInTrello} className="trello-card" style={getIssueStyle()}>
-      {cardData.members.length === 0 && (<ToolTips text={"Aucun membre n'est affecté à cette carte"} />)}
+    <div className="trello-card" style={cardIssue[1]}>
+      {cardIssue[0] != undefined && (<ToolTips text={cardIssue[0]} />)}
       <div className='container label-container'>
         {cardData.labels.map((label, index) => (
           <p className='card-label' style={{ backgroundColor: getColor(label.color) }} key={index}>{label.name}</p>
         ))}
       </div>
       <div className='main-info-container'>
-        <p>{cardData.name}</p>
+        <a href={cardData.shortUrl}>{cardData.name}</a>
         {showStats != undefined && (
-          <>
-            <div className='card-info-slot'>
-              <p><span>Date de début : </span>{startDate?.toLocaleString("FR") ?? 'Non connue'}</p>
-              <p><span>Date de fin : </span>{doneDate?.toLocaleString("FR") ?? 'Non connue'}</p>
-              <p><span>Leadtime : </span>{leadtime ?? '--'}</p>
-            </div>
-            <div className='card-info-slot'>
-              <p style={{ marginTop: 0 }}><span>Côut horaire : </span>{9}h<img src={require('../editing.png')} className='edit-button' /></p>
-              <p style={{ marginTop: 0 }}><span>Estimé : </span>{8}h</p>
-            </div>
-          </>
+          <div className='card-info-slot'>
+            <p><span>Date de début : </span>{startDate?.toLocaleString("FR") ?? 'Non connue'}</p>
+            <p><span>Date de fin : </span>{doneDate?.toLocaleString("FR") ?? 'Non connue'}</p>
+            <p><span>Leadtime : </span>{leadtime ?? '--'}</p>
+          </div>
+        )}
+        {showTimeInfos != undefined && (
+          <div className='card-info-slot'>
+            {showStats && (
+              <p onClick={changeHourlyCost} style={{ marginTop: 0 }}><span>Côut horaire : </span>{hourlyCost ?? '-- '}h
+                <img src={require('../editing.png')} className='edit-button' />
+              </p>
+            )}
+            <p onClick={changeEstimatedHourlyCost} style={{ marginTop: 0 }}><span>Temps estimé : </span>{estimatedHourlyCost ?? '-- '}h
+              <img src={require('../editing.png')} className='edit-button' />
+            </p>
+          </div>
         )}
       </div>
       <div className='container member-container'>
