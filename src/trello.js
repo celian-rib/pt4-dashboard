@@ -1,0 +1,6 @@
+export default {
+    TRELLO_BOARD_ID: 'Osys3HjD',
+    WAITING_LIST_ID: '61faa717a433877241cff9d2',
+    IN_PROGRESS_LIST_ID: '61fa5d7fe215792174c7579e',
+    DONE_LIST_ID: '61fa5d8218aebf5547986dc1'
+}
