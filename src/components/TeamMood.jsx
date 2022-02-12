@@ -72,7 +72,7 @@ function TeamMood(props) {
     <div className="team-mood-container">
       {Object.entries(weekMoods).map(([member, mood], index) => (
         <div
-          style={(mood === '⌛' || mood == undefined) ? { borderColor: '#d45950' } : {}}
+          style={(mood === '⌛' || mood == undefined) ? { borderColor: '#ff78a9' } : {}}
           key={index}
           className='mood-container'
         >

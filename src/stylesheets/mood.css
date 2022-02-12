@@ -10,13 +10,16 @@
 .mood-container {
     min-width: 30px;
     height: 30px;
-    border: solid grey 3px;
+    
+    border: solid 4px transparent;
+
+    box-shadow: 0 0 10px 0 rgba(85, 138, 173, 0.5);
     border-radius: 10px;
 
     display: flex;
     align-items: center;
 
-    padding: 2px 12px;
+    padding: 5px 20px;
 }
 
 .mood-container > select {

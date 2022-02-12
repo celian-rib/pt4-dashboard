@@ -67,13 +67,13 @@ function CardTrello(props) {
   }, [cardData]);
 
   const cardIssue = useMemo(() => {
-    const errorStyle = { borderColor: '#d45950', borderWidth: 5, borderStyle: 'solid' };
+    const errorStyle = { borderColor: '#ff78a9', borderWidth: 4, borderStyle: 'solid' };
     if (cardData?.idList === trello.DONE_LIST_ID && (estimatedHourlyCost == null || hourlyCost == null))
       return ['Information sur les horaires manquante(s)', errorStyle];
     if (cardData?.idList === trello.IN_PROGRESS_LIST_ID && estimatedHourlyCost == null)
       return ['Estimation du temps de réalisation manquante', errorStyle];
     if (cardData?.members.length === 0)
-      return ['Aucun membre n\'est affecté à cette carte', { borderColor: '#3e8ccc', borderWidth: 5, borderStyle: 'solid' }];
+      return ['Aucun membre n\'est affecté à cette carte', { borderColor: '#3e8ccc', borderWidth: 4, borderStyle: 'solid' }];
     return [undefined, undefined];
   }, [cardData, estimatedHourlyCost, hourlyCost]);
 
