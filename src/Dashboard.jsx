@@ -3,12 +3,14 @@ import { useGlobal } from 'reactn';
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { ToastContainer } from 'react-toastify';
+import { getAuth } from 'firebase/auth';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './stylesheets/App.css';
 
 import TrelloTasks from './components/TrelloTasks';
 import TeamMood from './components/TeamMood';
+import Password from './components/Password';
 
 const FIRST_WEEK_DATE = new Date('2022-01-31');
 
@@ -35,6 +37,8 @@ const firebaseConfig = {
 
 function App() {
   const [, setDb] = useGlobal('firebase');
+  const [user] = useGlobal('user');
+  const [,setAuth] = useGlobal('auth');
   const [isLoading, setisLoading] = useGlobal('isLoading');
 
   const [weekStart, setWeekStart] = useState(undefined);
@@ -44,6 +48,8 @@ function App() {
   useEffect(() => {
     const app = initializeApp(firebaseConfig);
     const fbdb = getFirestore(app);
+    const auth = getAuth();
+    setAuth(auth);
     setDb(fbdb);
     changeWeek(0); // On start change to actual week
   }, []);
@@ -69,7 +75,7 @@ function App() {
       )}
       <div className='week-picker'>
         <p onClick={() => changeWeek(-1)}>Précédente</p>
-        <h1>Semaine {weekNumber}/6</h1>
+        <h1>Semaine {weekNumber}</h1>
         <p onClick={() => changeWeek(1)}>Suivante</p>
       </div>
       <h5>Du <span>{weekStart?.toLocaleDateString('FR')}</span> au <span>{weekEnd?.toLocaleDateString('FR')}</span></h5>
@@ -81,6 +87,9 @@ function App() {
         hideProgressBar
         position='bottom-right'
       />
+      {user == undefined && (
+        <Password />
+      )}
     </div>
   );
 }

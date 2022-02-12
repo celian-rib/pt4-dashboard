@@ -21,7 +21,9 @@ const moods = ['⌛', '😔', '😡', '😬', '😐', '🙂', '😀'];
 function TeamMood(props) {
 
   const { weekStart } = props;
+
   const [db] = useGlobal('firebase');
+  const [user] = useGlobal('user');
 
   const [weekMoods, setWeekMoods] = useState({});
 
@@ -46,7 +48,6 @@ function TeamMood(props) {
     if (db == undefined || weekStart == undefined)
       return;
 
-    console.log('REFETCH FOR', weekId);
     const docRef = collection(db, 'moods');
     const moodsResult = await (await getDoc(doc(docRef, weekId))).data();
     if (moodsResult != undefined) {
@@ -77,6 +78,7 @@ function TeamMood(props) {
         >
           {membersDisplayName[member]}
           <select
+            disabled={user == undefined}
             option={moods}
             onChange={(value) => updateMemberMood(member, value.target.value)}
             key={mood} // Force refresh select https://github.com/ant-design/ant-design/issues/4347

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import '../stylesheets/App.css';
 import trello from '../trello';
@@ -11,12 +11,12 @@ const CARDS_URL = `/boards/${trello.TRELLO_BOARD_ID}/cards`;
 const MEMBERS_URL = `/boards/${trello.TRELLO_BOARD_ID}/members`;
 
 const chunkArray = (arr, chunkSize) => arr.reduce((resultArray, item, index) => {
-  const chunkIndex = Math.floor(index / chunkSize)
+  const chunkIndex = Math.floor(index / chunkSize);
   if (!resultArray[chunkIndex])
-    resultArray[chunkIndex] = []
-  resultArray[chunkIndex].push(item)
-  return resultArray
-}, [])
+    resultArray[chunkIndex] = [];
+  resultArray[chunkIndex].push(item);
+  return resultArray;
+}, []);
 
 const flatDeep = (arr, d = 1) => d > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), [])
   : arr.slice();
@@ -27,13 +27,13 @@ const getDataBatched = async (endPoints) => {
   const batchedResult = await fetch(urlsQuery)
     .then(result => result.json());
   return batchedResult.map(r => r[200]);
-}
+};
 
 function TrelloTasks(props) {
 
   const { weekStart, weekEnd } = props;
 
-  const [, setIsLoading] = useGlobal("isLoading");
+  const [, setIsLoading] = useGlobal('isLoading');
 
   const [weekDoneCards, setWeekDoneCards] = useState([]);
   const [weekWaitingCards, setWeekWaitingCards] = useState([]);
@@ -78,7 +78,7 @@ function TrelloTasks(props) {
     setWeekDoneCards(thisWeekCards.filter(c => c.idList === trello.DONE_LIST_ID));
 
     setIsLoading(false);
-  }
+  };
 
   const getCardActions = (id) => weekActions.filter(action => action?.data?.card?.id === id);
 

@@ -17,31 +17,23 @@ const dateFormat = {
   minute: '2-digit'
 };
 
-const getColor = (colorName) => {
-  switch (colorName) {
-  case 'red':
-    return '#ed7979';
-  case 'blue':
-    return '#79b3ed';
-  case 'green':
-    return '#60ad5a';
-  case 'lime':
-    return '#51b0a3';
-  case 'black':
-    return '#223331';
-  case 'pink':
-    return '#c88cde';
-  case 'orange':
-    return '#e69b63';
-  default:
-    return colorName;
-  }
+
+const colors = {
+  red: '#ed7979',
+  blue: '#79b3ed',
+  green: '#60ad5a',
+  lime: '#51b0a3',
+  black: '#223331',
+  pink: '#c88cde',
+  orange: '#e69b63',
 };
 
 function CardTrello(props) {
   const { cardData, showStats, showTimeInfos, actions = [] } = props;
 
+  const [user] = useGlobal('user');
   const [db] = useGlobal('firebase');
+
   const [estimatedHourlyCost, setEstimatedHourlyCost] = useState(undefined);
   const [hourlyCost, setHourlyCost] = useState(undefined);
   const [init, setInit] = useState(false);
@@ -138,7 +130,7 @@ function CardTrello(props) {
       {cardIssue[0] != undefined && (<ToolTips text={cardIssue[0]} />)}
       <div className='container label-container'>
         {cardData.labels.map((label, index) => (
-          <p className='card-label' style={{ backgroundColor: getColor(label.color) }} key={index}>{label.name}</p>
+          <p className='card-label' style={{ backgroundColor: colors[label.color] ?? label.color }} key={index}>{label.name}</p>
         ))}
       </div>
       <div className='main-info-container'>
@@ -153,12 +145,16 @@ function CardTrello(props) {
         {showTimeInfos != undefined && (
           <div className='card-info-slot'>
             {showStats && (
-              <p onClick={changeHourlyCost} style={{ marginTop: 0 }}><span>Coût horaire : </span>{hourlyCost ?? '-- '}h
-                <img src={require('../assets/editing.png')} className='edit-button' />
+              <p onClick={() => user != undefined && changeHourlyCost()} style={{ marginTop: 0 }}><span>Coût horaire : </span>{hourlyCost ?? '-- '}h
+                {user != undefined && (
+                  <img src={require('../assets/editing.png')} className='edit-button' />
+                )}
               </p>
             )}
-            <p onClick={changeEstimatedHourlyCost} style={{ marginTop: 0 }}><span>Temps estimé : </span>{estimatedHourlyCost ?? '-- '}h
-              <img src={require('../assets/editing.png')} className='edit-button' />
+            <p onClick={() => user != undefined && changeEstimatedHourlyCost()} style={{ marginTop: 0 }}><span>Temps estimé : </span>{estimatedHourlyCost ?? '-- '}h
+              {user != undefined && (
+                <img src={require('../assets/editing.png')} className='edit-button' />
+              )}
             </p>
           </div>
         )}
