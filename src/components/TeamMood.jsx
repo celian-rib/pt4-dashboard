@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import '../stylesheets/mood.css';
 import { useGlobal } from 'reactn';
-import { collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
 
 import { toast } from 'react-toastify';
 
@@ -14,7 +14,7 @@ const membersDisplayName = {
   emillien: 'Emillien',
   hugo: 'Hugo',
   celian: 'Célian'
-}
+};
 
 const moods = ['⌛', '😔', '😡', '😬', '😐', '🙂', '😀'];
 
@@ -23,13 +23,13 @@ function TeamMood(props) {
   const { weekStart } = props;
   const [db] = useGlobal('firebase');
 
-  const [weekMoods, setWeekMoods] = useState({})
+  const [weekMoods, setWeekMoods] = useState({});
 
   const weekId = useMemo(() => weekStart?.toLocaleDateString('FR').replaceAll('/', '-') ?? null, [weekStart]);
 
   const updateMemberMood = (member, value) => setWeekMoods(old => {
     const newData = { ...old };
-    newData[member] = value
+    newData[member] = value;
 
     const cardsRef = collection(db, 'moods');
     setDoc(doc(cardsRef, weekId), newData);
@@ -47,7 +47,7 @@ function TeamMood(props) {
       return;
 
     console.log('REFETCH FOR', weekId);
-    const docRef = collection(db, 'moods')
+    const docRef = collection(db, 'moods');
     const moodsResult = await (await getDoc(doc(docRef, weekId))).data();
     if (moodsResult != undefined) {
       setWeekMoods(moodsResult);
@@ -59,9 +59,9 @@ function TeamMood(props) {
     const obj = {};
     moodsArray.forEach((m, index) => {
       obj[members[index]] = m;
-    })
+    });
     setWeekMoods(obj);
-  }
+  };
 
   useEffect(() => {
     console.log(weekMoods);
