@@ -10,7 +10,7 @@
 .mood-container {
     min-width: 30px;
     height: 30px;
-    border: solid grey 2px;
+    border: solid grey 3px;
     border-radius: 10px;
 
     display: flex;
