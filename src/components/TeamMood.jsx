@@ -20,7 +20,7 @@ const moods = ['⌛', '😔', '😡', '😬', '😐', '🙂', '😀'];
 
 function TeamMood(props) {
 
-  const { weekStart, weekEnd } = props;
+  const { weekStart } = props;
   const [db] = useGlobal('firebase');
 
   const [weekMoods, setWeekMoods] = useState({})
