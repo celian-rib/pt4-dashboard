@@ -1,4 +1,5 @@
-<center><h1>PT4 - Dashboard</h1></center>
+<h1 align="center">PT4 - Dashboard</h1>
+
 
 > Trello but with enhanced project management features !
 
@@ -10,12 +11,18 @@
 - Gathers the information given in meetings.
 
 <br />
-<center><h1>Task tracking !</h1></center>
+<h1 align="center">Task tracking !</h1>
+
+<p align="center">
 <img src="./assets/tasks.png" />
+</p>
 
 <br />
-<center><h1>Team mood !</h1></center>
+<h1 align="center">Team mood !</h1>
+
+<p align="center">
 <img src="./assets/moods.png" />
+</p>
 
 ***
 
