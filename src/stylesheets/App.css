@@ -48,6 +48,29 @@
   font-size: 20px;
 }
 
+.trello {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.trello-stats {
+  width: 700px;
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 20px;
+}
+
+.trello-stats span {
+  color: grey;
+  font-weight: 500;
+}
+
+.trello-stats > h4 {
+  text-align: center;
+}
+
 .trello-lists-container {
   width: 100%;
   display: flex;

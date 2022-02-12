@@ -42,10 +42,21 @@ function TrelloTasks(props) {
   const [weekInProgressCards, setWeekInProgressCards] = useState([]);
   const [weekActions, setWeekActions] = useState([]);
 
+  const [totalLeadTime, setTotalLeadTime] = useState(0);
+  const [totalHourlyCost, setTotalHourlyCost] = useState(0);
+  const [totalEstimatedHourlyCost, setTotalEstimatedHourlyCost] = useState(0);
+
+  const addLeadTime = (value) => setTotalLeadTime(old => old + value);
+  const addTotalHourlyCost = (value) => setTotalHourlyCost(old => old + value);
+  const addTotalEstimatedHourlyCost = (value) => setTotalEstimatedHourlyCost(old => old + value);
+
   const totalCards = () => weekDoneCards.length + weekWaitingCards.length + weekInProgressCards.length;
 
   // When week end and start are defined we get all trello data for this week
   useEffect(() => {
+    setTotalLeadTime(0);
+    setTotalHourlyCost(0);
+    setTotalEstimatedHourlyCost(0);
     if (weekStart == undefined || weekEnd == undefined)
       return;
     getThisWeekData();
@@ -85,55 +96,71 @@ function TrelloTasks(props) {
   const getCardActions = (id) => weekActions.filter(action => action?.data?.card?.id === id);
 
   return (
-    <div className='trello-lists-container'>
-      {(weekEnd >= new Date()) && ( // Display waiting/in progress only for current and future weeks
-        <>
-          <div className='trello-list-slot'>
-            <h1>Tâches à faire
-              <span> ({weekWaitingCards.length}/{totalCards()})</span>
-            </h1>
-            <div className='trello-list'>
-              {weekWaitingCards.map((card, index) => (
-                <CardTrello
-                  cardData={card}
-                  showHourlyCostEstimation
-                  key={index}
-                  actions={getCardActions(card.id)}
-                />
-              ))}
+    <div className='trello'>
+      <div className='trello-stats'>
+        <h4><span>Total Leadtime :</span><br /> {totalLeadTime} heures</h4>
+        <h4><span>Total coûts horaires :</span><br /> {totalHourlyCost} heures</h4>
+        <h4><span>Total coûts horaires estimés :</span><br /> {totalEstimatedHourlyCost} heures</h4>
+      </div>
+      <div className='trello-lists-container'>
+        {(weekEnd >= new Date()) && ( // Display waiting/in progress only for current and future weeks
+          <>
+            <div className='trello-list-slot'>
+              <h1>Tâches à faire
+                <span> ({weekWaitingCards.length}/{totalCards()})</span>
+              </h1>
+              <div className='trello-list'>
+                {weekWaitingCards.map((card, index) => (
+                  <CardTrello
+                    addLeadTime={addLeadTime}
+                    addTotalHourlyCost={addTotalHourlyCost}
+                    addTotalEstimatedHourlyCost={addTotalEstimatedHourlyCost}
+                    cardData={card}
+                    showHourlyCostEstimation
+                    key={index}
+                    actions={getCardActions(card.id)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-          <div className='trello-list-slot'>
-            <h1>Tâches en cours
-              <span> ({weekInProgressCards.length}/{totalCards()})</span>
-            </h1>
-            <div className='trello-list'>
-              {weekInProgressCards.map((card, index) => (
-                <CardTrello
-                  cardData={card}
-                  showHourlyCostEstimation
-                  key={index}
-                  actions={getCardActions(card.id)}
-                />
-              ))}
+            <div className='trello-list-slot'>
+              <h1>Tâches en cours
+                <span> ({weekInProgressCards.length}/{totalCards()})</span>
+              </h1>
+              <div className='trello-list'>
+                {weekInProgressCards.map((card, index) => (
+                  <CardTrello
+                    addLeadTime={addLeadTime}
+                    addTotalHourlyCost={addTotalHourlyCost}
+                    addTotalEstimatedHourlyCost={addTotalEstimatedHourlyCost}
+                    cardData={card}
+                    showHourlyCostEstimation
+                    key={index}
+                    actions={getCardActions(card.id)}
+                  />
+                ))}
+              </div>
             </div>
+          </>
+        )}
+        <div className='trello-list-slot'>
+          <h1>Tâches terminées
+            <span> ({weekDoneCards.length}/{totalCards()})</span>
+          </h1>
+          <div className='trello-list'>
+            {weekDoneCards.map((card, index) => (
+              <CardTrello
+                addLeadTime={addLeadTime}
+                addTotalHourlyCost={addTotalHourlyCost}
+                addTotalEstimatedHourlyCost={addTotalEstimatedHourlyCost}
+                cardData={card}
+                showStats
+                showHourlyCostEstimation
+                actions={getCardActions(card.id)}
+                key={index}
+              />
+            ))}
           </div>
-        </>
-      )}
-      <div className='trello-list-slot'>
-        <h1>Tâches terminées
-          <span> ({weekDoneCards.length}/{totalCards()})</span>
-        </h1>
-        <div className='trello-list'>
-          {weekDoneCards.map((card, index) => (
-            <CardTrello
-              cardData={card}
-              showStats
-              showHourlyCostEstimation
-              actions={getCardActions(card.id)}
-              key={index}
-            />
-          ))}
         </div>
       </div>
     </div>
