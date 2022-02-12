@@ -29,7 +29,7 @@ const colors = {
 };
 
 function CardTrello(props) {
-  const { cardData, showStats, showTimeInfos, actions = [] } = props;
+  const { cardData, showStats, showHourlyCostEstimation, actions = [] } = props;
 
   const [user] = useGlobal('user');
   const [db] = useGlobal('firebase');
@@ -142,7 +142,7 @@ function CardTrello(props) {
             <p><span>Leadtime : </span>{leadtime ?? '--'}</p>
           </div>
         )}
-        {showTimeInfos != undefined && (
+        {showHourlyCostEstimation != undefined && (
           <div className='card-info-slot'>
             {showStats && (
               <p onClick={() => user != undefined && changeHourlyCost()} style={{ marginTop: 0 }}><span>Coût horaire : </span>{hourlyCost ?? '-- '}h

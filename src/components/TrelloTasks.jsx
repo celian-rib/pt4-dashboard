@@ -18,8 +18,10 @@ const chunkArray = (arr, chunkSize) => arr.reduce((resultArray, item, index) => 
   return resultArray;
 }, []);
 
-const flatDeep = (arr, d = 1) => d > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), [])
-  : arr.slice();
+const flatDeep = (arr, d = 1) => d > 0 ?
+  arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), [])
+  :
+  arr.slice();
 
 const getDataBatched = async (endPoints) => {
   const urls = endPoints.join(',');
@@ -94,6 +96,7 @@ function TrelloTasks(props) {
               {weekWaitingCards.map((card, index) => (
                 <CardTrello
                   cardData={card}
+                  showHourlyCostEstimation
                   key={index}
                   actions={getCardActions(card.id)}
                 />
@@ -108,7 +111,7 @@ function TrelloTasks(props) {
               {weekInProgressCards.map((card, index) => (
                 <CardTrello
                   cardData={card}
-                  showTimeInfos
+                  showHourlyCostEstimation
                   key={index}
                   actions={getCardActions(card.id)}
                 />
@@ -126,7 +129,7 @@ function TrelloTasks(props) {
             <CardTrello
               cardData={card}
               showStats
-              showTimeInfos
+              showHourlyCostEstimation
               actions={getCardActions(card.id)}
               key={index}
             />

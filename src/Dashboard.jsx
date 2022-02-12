@@ -5,6 +5,8 @@ import { getFirestore } from 'firebase/firestore';
 import { ToastContainer } from 'react-toastify';
 import { getAuth } from 'firebase/auth';
 
+import { GridLoader } from 'react-spinners';
+
 import 'react-toastify/dist/ReactToastify.css';
 import './stylesheets/App.css';
 
@@ -38,8 +40,8 @@ const firebaseConfig = {
 function App() {
   const [, setDb] = useGlobal('firebase');
   const [user] = useGlobal('user');
-  const [,setAuth] = useGlobal('auth');
-  const [isLoading, setisLoading] = useGlobal('isLoading');
+  const [, setAuth] = useGlobal('auth');
+  const [isLoading, setIsLoading] = useGlobal('isLoading');
 
   const [weekStart, setWeekStart] = useState(undefined);
   const [weekEnd, setWeekEnd] = useState(undefined);
@@ -55,7 +57,7 @@ function App() {
   }, []);
 
   const changeWeek = (step = 0) => {
-    setisLoading(true);
+    setIsLoading(true);
     const [start, end] = getWeekDates(step == 0 ? new Date() : shiftDate(weekStart, step));
     setWeekStart(start);
     setWeekEnd(end);
@@ -71,7 +73,9 @@ function App() {
   return (
     <div className="App">
       {isLoading !== false && (
-        <div className='loading'><h1>Chargement des données...</h1><div></div></div>
+        <div className='loading'>
+          <GridLoader color={'#45c3e6'} loading size={20} />
+        </div>
       )}
       <div className='week-picker'>
         <p onClick={() => changeWeek(-1)}>Précédente</p>
