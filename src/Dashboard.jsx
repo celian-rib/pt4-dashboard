@@ -17,14 +17,17 @@ import Password from './components/Password';
 const FIRST_WEEK_DATE = new Date('2022-01-31');
 
 const getWeekDates = (curr = new Date()) => {
-  const firstday = new Date(curr.setDate(curr.getDate() - curr.getDay() + 1));
+  const firstday = new Date(curr.setDate(curr.getDate() - curr.getDay() + (curr.getDay() == 0 ? -6 : 1)));
   const lastday = new Date(curr.setDate(curr.getDate() - curr.getDay() + 7));
+  firstday.setHours(0, 0, 0, 0);
+  lastday.setHours(23, 59, 59, 0);
   return [firstday, lastday];
 };
 
 const shiftDate = (date = new Date(), shift = 1) => {
   const resultDate = new Date(date);
-  resultDate.setDate(date.getDate() + 6 * shift);
+  resultDate.setHours(0, 0, 0, 0);
+  resultDate.setDate(date.getDate() + 7 * shift);
   return resultDate;
 };
 

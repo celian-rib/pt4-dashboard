@@ -64,10 +64,6 @@ function TeamMood(props) {
     setWeekMoods(obj);
   };
 
-  useEffect(() => {
-    console.log(weekMoods);
-  }, [weekMoods]);
-
   return (
     <div className="team-mood-container">
       {Object.entries(weekMoods).map(([member, mood], index) => (
