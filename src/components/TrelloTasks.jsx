@@ -66,7 +66,9 @@ function TrelloTasks(props) {
     setIsLoading(true);
     const [members, cards] = await getDataBatched([MEMBERS_URL, CARDS_URL]);
 
-    const thisWeekCards = cards
+
+
+    let thisWeekCards = cards
       .filter(c => {
         const cardLastActivity = new Date(c.dateLastActivity);
         // Allow waitings card to be displayed in futures weeks
@@ -80,12 +82,20 @@ function TrelloTasks(props) {
 
     // Batch all actions requests (Chunks of 10 endpoints)
     const chunkedActionsUrls = chunkArray(thisWeekCards.map(c => `/cards/${c.id}/actions`), 10);
-    const tmpActions = [];
+    let tmpActions = [];
     for (const actionUrlChunk of chunkedActionsUrls) {
       tmpActions.push(await getDataBatched(actionUrlChunk));
     }
+    tmpActions = flatDeep(tmpActions, Infinity);
 
-    setWeekActions(flatDeep(tmpActions, Infinity));
+    console.log(tmpActions);
+
+    thisWeekCards = thisWeekCards.filter(c => {
+      const cardActions = tmpActions.filter(action => action?.data?.card?.id === c.id);
+      return (weekStart <= cardActions[0]?.date && cardActions[0]?.date <= weekEnd);
+    });
+
+    setWeekActions(tmpActions);
     setWeekWaitingCards(thisWeekCards.filter(c => c.idList === trello.WAITING_LIST_ID));
     setWeekInProgressCards(thisWeekCards.filter(c => c.idList === trello.IN_PROGRESS_LIST_ID));
     setWeekDoneCards(thisWeekCards.filter(c => c.idList === trello.DONE_LIST_ID));

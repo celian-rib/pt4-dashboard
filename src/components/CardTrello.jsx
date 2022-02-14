@@ -45,8 +45,11 @@ function CardTrello(props) {
   const [hourlyCost, setHourlyCost] = useState(undefined);
   const [init, setInit] = useState(false);
 
+
   useEffect(() => {
     if (cardData == undefined || init == false)
+      return;
+    if (user == undefined)
       return;
     const cardsRef = collection(db, 'cards');
     setDoc(doc(cardsRef, cardData.id), {
@@ -59,6 +62,7 @@ function CardTrello(props) {
       hourlyCost: hourlyCost ?? null,
       estimatedHourlyCost: estimatedHourlyCost ?? null
     });
+    console.log('Updating', cardData.name, cardData.id);
   }, [init, hourlyCost, estimatedHourlyCost]);
 
   useEffect(() => {
@@ -68,17 +72,23 @@ function CardTrello(props) {
     getDoc(doc(cardsRef, cardData.id)).then(fbData => {
       const data = fbData.data();
 
+      if (data == undefined) {
+        console.log('Card not in DB', cardData.name);
+        setInit(true);
+        return;
+      }
+
       setEstimatedHourlyCost(data.estimatedHourlyCost);
       setHourlyCost(data.hourlyCost);
 
-      if (data.isDone) {
+      if (data.isDone && !init) {
         addTotalEstimatedHourlyCost(parseFloat(data.estimatedHourlyCost ?? 0));
         addTotalHourlyCost(parseFloat(data.hourlyCost ?? 0));
       }
 
       setInit(true);
     });
-  }, [cardData]);
+  }, [cardData, user]);
 
   const cardIssue = useMemo(() => {
     const errorStyle = { borderColor: '#ff78a9', borderWidth: 4, borderStyle: 'solid' };
