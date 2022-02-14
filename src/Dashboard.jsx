@@ -45,6 +45,7 @@ function App() {
   const [user] = useGlobal('user');
   const [, setAuth] = useGlobal('auth');
   const [isLoading, setIsLoading] = useGlobal('isLoading');
+  const [loadingStatus] = useGlobal('loadingStatus');
 
   const [weekStart, setWeekStart] = useState(undefined);
   const [weekEnd, setWeekEnd] = useState(undefined);
@@ -78,6 +79,7 @@ function App() {
       {isLoading !== false && (
         <div className='loading'>
           <GridLoader color={'#45c3e6'} loading size={20} />
+          <p>{loadingStatus}</p>
         </div>
       )}
       <div className='week-picker'>

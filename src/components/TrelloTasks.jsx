@@ -36,11 +36,12 @@ function TrelloTasks(props) {
   const { weekStart, weekEnd } = props;
 
   const [, setIsLoading] = useGlobal('isLoading');
+  const [, setLoadingStatus] = useGlobal('loadingStatus');
+
 
   const [weekDoneCards, setWeekDoneCards] = useState([]);
   const [weekWaitingCards, setWeekWaitingCards] = useState([]);
   const [weekInProgressCards, setWeekInProgressCards] = useState([]);
-  const [weekActions, setWeekActions] = useState([]);
 
   const [totalLeadTime, setTotalLeadTime] = useState(0);
   const [totalHourlyCost, setTotalHourlyCost] = useState(0);
@@ -64,23 +65,31 @@ function TrelloTasks(props) {
 
   const getThisWeekData = async () => {
     setIsLoading(true);
+    setLoadingStatus('Récupéraion des cartes Trello');
     const [members, cards] = await getDataBatched([MEMBERS_URL, CARDS_URL]);
 
-
+    // const [waitingActions, progressActions, doneActions] = await getDataBatched([
+    //   `/lists/${trello.WAITING_LIST_ID}/actions`,
+    //   `/lists/${trello.IN_PROGRESS_LIST_ID}/actions`,
+    //   `/lists/${trello.DONE_LIST_ID}/actions`,
+    // ]);
+    // const actions = [...waitingActions, ...progressActions, ...doneActions];
 
     let thisWeekCards = cards
-      .filter(c => {
-        const cardLastActivity = new Date(c.dateLastActivity);
-        // Allow waitings card to be displayed in futures weeks
-        const canBeLater = weekStart >= new Date() && c.idList === trello.WAITING_LIST_ID;
-        return (weekStart <= cardLastActivity && cardLastActivity <= weekEnd) || canBeLater;
-      })
+      // .filter(c => {
+      //   const cardLastActivity = new Date(c.dateLastActivity);
+      //   // Allow waitings card to be displayed in futures weeks
+      //   const canBeLater = weekStart >= new Date() && c.idList === trello.WAITING_LIST_ID;
+      //   return (weekStart <= cardLastActivity && cardLastActivity <= weekEnd) || canBeLater;
+      // })
       .map(c => ({
         ...c,
         members: c.idMembers.map(idm => members.find(m => m.id === idm))
       }));
 
+
     // Batch all actions requests (Chunks of 10 endpoints)
+    setLoadingStatus('Traitement des cartes de la semaine');
     const chunkedActionsUrls = chunkArray(thisWeekCards.map(c => `/cards/${c.id}/actions`), 10);
     let tmpActions = [];
     for (const actionUrlChunk of chunkedActionsUrls) {
@@ -88,22 +97,23 @@ function TrelloTasks(props) {
     }
     tmpActions = flatDeep(tmpActions, Infinity);
 
-    console.log(tmpActions);
-
-    thisWeekCards = thisWeekCards.filter(c => {
-      const cardActions = tmpActions.filter(action => action?.data?.card?.id === c.id);
-      return (weekStart <= cardActions[0]?.date && cardActions[0]?.date <= weekEnd);
+    thisWeekCards = thisWeekCards.map(c => ({
+      ...c,
+      actions: tmpActions.filter(a => a.type == 'updateCard' && a?.data?.card.id === c.id)
+    })).filter(c => {
+      const cardLastActivity = new Date(c?.hardEndDate ?? c.actions[0]?.date ?? c.dateLastActivity);
+      // Allow waitings card to be displayed in futures weeks
+      const canBeLater = weekStart >= new Date() && c.idList === trello.WAITING_LIST_ID;
+      return (weekStart <= cardLastActivity && cardLastActivity <= weekEnd) || canBeLater;
     });
 
-    setWeekActions(tmpActions);
+    // setWeekActions(tmpActions);
     setWeekWaitingCards(thisWeekCards.filter(c => c.idList === trello.WAITING_LIST_ID));
     setWeekInProgressCards(thisWeekCards.filter(c => c.idList === trello.IN_PROGRESS_LIST_ID));
     setWeekDoneCards(thisWeekCards.filter(c => c.idList === trello.DONE_LIST_ID));
 
     setIsLoading(false);
   };
-
-  const getCardActions = (id) => weekActions.filter(action => action?.data?.card?.id === id);
 
   return (
     <div className='trello'>
@@ -112,6 +122,7 @@ function TrelloTasks(props) {
         <h4><span>Total coûts horaires :</span><br /> {totalHourlyCost} heures</h4>
         <h4><span>Total coûts horaires estimés :</span><br /> {totalEstimatedHourlyCost} heures</h4>
       </div>
+      <p className='refresh-button' onClick={getThisWeekData}>Refresh</p>
       <div className='trello-lists-container'>
         {(weekEnd >= new Date()) && ( // Display waiting/in progress only for current and future weeks
           <>
@@ -128,7 +139,6 @@ function TrelloTasks(props) {
                     cardData={card}
                     showHourlyCostEstimation
                     key={index}
-                    actions={getCardActions(card.id)}
                   />
                 ))}
               </div>
@@ -146,7 +156,6 @@ function TrelloTasks(props) {
                     cardData={card}
                     showHourlyCostEstimation
                     key={index}
-                    actions={getCardActions(card.id)}
                   />
                 ))}
               </div>
@@ -166,7 +175,6 @@ function TrelloTasks(props) {
                 cardData={card}
                 showStats
                 showHourlyCostEstimation
-                actions={getCardActions(card.id)}
                 key={index}
               />
             ))}

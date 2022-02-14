@@ -32,7 +32,6 @@ function CardTrello(props) {
     cardData,
     showStats,
     showHourlyCostEstimation,
-    actions = [],
     addLeadTime,
     addTotalHourlyCost,
     addTotalEstimatedHourlyCost
@@ -44,6 +43,7 @@ function CardTrello(props) {
   const [estimatedHourlyCost, setEstimatedHourlyCost] = useState(undefined);
   const [hourlyCost, setHourlyCost] = useState(undefined);
   const [init, setInit] = useState(false);
+  const [hardEndDate, setHardEndDate] = useState(undefined);
 
 
   useEffect(() => {
@@ -60,7 +60,8 @@ function CardTrello(props) {
       doneDate: doneDate ?? null,
       leadtime: leadtime ?? null,
       hourlyCost: hourlyCost ?? null,
-      estimatedHourlyCost: estimatedHourlyCost ?? null
+      estimatedHourlyCost: estimatedHourlyCost ?? null,
+      hardEndDate: cardData.hardEndDate ?? null
     });
     console.log('Updating', cardData.name, cardData.id);
   }, [init, hourlyCost, estimatedHourlyCost]);
@@ -80,6 +81,11 @@ function CardTrello(props) {
 
       setEstimatedHourlyCost(data.estimatedHourlyCost);
       setHourlyCost(data.hourlyCost);
+
+      if (data.hardEndDate) {
+        console.log(data.hardEndDate);
+        setHardEndDate(new Date(data.hardEndDate));
+      }
 
       if (data.isDone && !init) {
         addTotalEstimatedHourlyCost(parseFloat(data.estimatedHourlyCost ?? 0));
@@ -102,25 +108,25 @@ function CardTrello(props) {
   }, [cardData, estimatedHourlyCost, hourlyCost]);
 
   const isDone = useMemo(() => {
-    return actions[0]?.data?.listAfter?.id === trello.DONE_LIST_ID;
-  }, [actions]);
+    return cardData?.actions[0]?.data?.listAfter?.id === trello.DONE_LIST_ID;
+  }, [cardData?.actions]);
 
   const doneDate = useMemo(() => {
     if (!isDone)
       return undefined;
-    return new Date(actions[0]?.date);
-  }, [actions]);
+    return new Date(cardData?.actions[0]?.date);
+  }, [cardData?.actions, hardEndDate]);
 
   const creationDate = useMemo(() => {
     return new Date(parseInt(cardData.id.slice(0, 8), 16) * 1000);
   }, [cardData]);
 
   const startDate = useMemo(() => {
-    const action = actions.find(a => a.data?.listAfter?.id === trello.IN_PROGRESS_LIST_ID);
+    const action = cardData?.actions.find(a => a.data?.listAfter?.id === trello.IN_PROGRESS_LIST_ID);
     if (action == undefined)
       return undefined;
     return new Date(action.date);
-  }, [actions]);
+  }, [cardData?.actions]);
 
   const leadtime = useMemo(() => {
     const diff = doneDate - startDate;
@@ -164,7 +170,7 @@ function CardTrello(props) {
   };
 
   return (
-    <div className="trello-card" style={cardIssue[1]}>
+    <div onClick={() => console.log(cardData)} className="trello-card" style={cardIssue[1]}>
       {cardIssue[0] != undefined && (<ToolTips text={cardIssue[0]} />)}
       <div className='container label-container'>
         {cardData.labels.map((label, index) => (
@@ -172,7 +178,7 @@ function CardTrello(props) {
         ))}
       </div>
       <div className='main-info-container'>
-        <a href={cardData.shortUrl}>{cardData.name}</a>
+        <a target="_blank" href={cardData.shortUrl} rel="noreferrer">{cardData.name}</a>
         {showStats != undefined && (
           <div className='card-info-slot'>
             <p><span>Date de début : </span>{startDate?.toLocaleString('FR', dateFormat) ?? 'Non connue'}</p>

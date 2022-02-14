@@ -13,6 +13,12 @@
   flex-direction: column;
 }
 
+.loading>p {
+  font-size: 20px;
+  font-weight: 700;
+  color: gray;
+}
+
 .separator {
   margin: 30px 0;
   width: 100%;
@@ -67,7 +73,7 @@
   font-weight: 500;
 }
 
-.trello-stats > h4 {
+.trello-stats>h4 {
   text-align: center;
 }
 
@@ -131,4 +137,18 @@
 
 .week-picker>p:hover {
   box-shadow: 0 0 15px 0 rgba(51, 80, 100, 0.589);
+}
+
+.refresh-button {
+  background-color: white;
+  padding: 10px 18px;
+  margin: 0;
+  border-radius: 10px;
+  transition: box-shadow 0.2s;
+  color: grey;
+}
+
+.refresh-button:hover {
+  box-shadow: 0 0 10px 0 rgba(85, 138, 173, 0.5);
+  cursor: pointer;
 }
