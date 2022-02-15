@@ -65,23 +65,10 @@ function TrelloTasks(props) {
 
   const getThisWeekData = async () => {
     setIsLoading(true);
-    setLoadingStatus('Récupéraion des cartes Trello');
+    setLoadingStatus('Récupération des cartes Trello');
     const [members, cards] = await getDataBatched([MEMBERS_URL, CARDS_URL]);
 
-    // const [waitingActions, progressActions, doneActions] = await getDataBatched([
-    //   `/lists/${trello.WAITING_LIST_ID}/actions`,
-    //   `/lists/${trello.IN_PROGRESS_LIST_ID}/actions`,
-    //   `/lists/${trello.DONE_LIST_ID}/actions`,
-    // ]);
-    // const actions = [...waitingActions, ...progressActions, ...doneActions];
-
     let thisWeekCards = cards
-      // .filter(c => {
-      //   const cardLastActivity = new Date(c.dateLastActivity);
-      //   // Allow waitings card to be displayed in futures weeks
-      //   const canBeLater = weekStart >= new Date() && c.idList === trello.WAITING_LIST_ID;
-      //   return (weekStart <= cardLastActivity && cardLastActivity <= weekEnd) || canBeLater;
-      // })
       .map(c => ({
         ...c,
         members: c.idMembers.map(idm => members.find(m => m.id === idm))
@@ -118,9 +105,9 @@ function TrelloTasks(props) {
   return (
     <div className='trello'>
       <div className='trello-stats'>
-        <h4><span>Total Leadtime :</span><br /> {totalLeadTime} heures</h4>
-        <h4><span>Total coûts horaires :</span><br /> {totalHourlyCost} heures</h4>
-        <h4><span>Total coûts horaires estimés :</span><br /> {totalEstimatedHourlyCost} heures</h4>
+        <h4><span>Total Leadtime :</span><br /> {totalLeadTime.toFixed(2)} heures</h4>
+        <h4><span>Total coûts horaires :</span><br /> {totalHourlyCost.toFixed(2)} heures</h4>
+        <h4><span>Total coûts horaires estimés :</span><br /> {totalEstimatedHourlyCost.toFixed(2)} heures</h4>
       </div>
       <p className='refresh-button' onClick={getThisWeekData}>Refresh</p>
       <div className='trello-lists-container'>
