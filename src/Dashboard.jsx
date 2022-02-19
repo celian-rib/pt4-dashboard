@@ -14,6 +14,8 @@ import TrelloTasks from './components/TrelloTasks';
 import TeamMood from './components/TeamMood';
 import Password from './components/Password';
 
+import Meetings from './components/Meetings';
+
 const FIRST_WEEK_DATE = new Date('2022-01-31');
 
 const getWeekDates = (curr = new Date()) => {
@@ -91,6 +93,7 @@ function App() {
       <div className='separator'></div>
       <TeamMood weekStart={weekStart} weekEnd={weekEnd} />
       <div className='separator'></div>
+      <Meetings />
       <TrelloTasks weekStart={weekStart} weekEnd={weekEnd} />
       <ToastContainer
         hideProgressBar
