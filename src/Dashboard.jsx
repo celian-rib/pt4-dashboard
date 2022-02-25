@@ -93,7 +93,7 @@ function App() {
       <div className='separator'></div>
       <TeamMood weekStart={weekStart} weekEnd={weekEnd} />
       <div className='separator'></div>
-      <Meetings />
+      <Meetings weekStart={weekStart} weekEnd={weekEnd} />
       <TrelloTasks weekStart={weekStart} weekEnd={weekEnd} />
       <ToastContainer
         hideProgressBar

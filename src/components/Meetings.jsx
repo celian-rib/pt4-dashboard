@@ -10,7 +10,8 @@ import MeetingCard from './MeetingCard';
 import { useEffect } from 'react';
 
 
-function Meetings() {
+function Meetings(props) {
+  const { weekStart, weekEnd } = props;
 
   const [user] = useGlobal('user');
   const [db] = useGlobal('firebase');
@@ -21,25 +22,31 @@ function Meetings() {
     // const result = prompt('Informations de la réunion');
     setMeetings(old => [...old, {
       id: new Date().getTime(),
-      date: new Date().toISOString(),
+      date: new Date(),
       content: ''
     }]);
   };
 
   useEffect(() => {
-    if(db == null)
+    if (db == null)
       return;
     const cardsRef = collection(db, 'meetings');
     getDocs(cardsRef).then(fbData => {
-      const data = fbData.docs.map(d => d.data());
-      setMeetings(data);
+      const data = fbData.docs
+        .map(d => d.data())
+        .map(m => ({...m, date: new Date(m.date)}));
+      console.log(data);
+      setMeetings(data.filter(m => m.date > weekStart && m.date < weekEnd));
     });
-  }, [db]);
+  }, [db, weekStart]);
 
   const saveMeeting = (meeting) => {
     console.log('SAVING ', meeting);
     const cardsRef = collection(db, 'meetings');
-    setDoc(doc(cardsRef, `${meeting.id}`), meeting);
+    setDoc(doc(cardsRef, `${meeting.id}`), {
+      ...meeting,
+      date: meeting.date.toISOString()
+    });
     toast.success('Réunion sauvegardée');
   };
 

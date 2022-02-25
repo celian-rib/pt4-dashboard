@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useMemo } from 'react';
 import { useGlobal } from 'reactn';
 import '../stylesheets/meetingCard.css';
 
@@ -19,7 +20,6 @@ function MeetingCard(props) {
   const [showDelete, setShowDelete] = useState(meetingData?.content?.length == 0);
 
   const onChange = (newContent) => {
-    setShowSave(newContent != meetingData.content);
     meetingData.content = newContent;
     setShowDelete(newContent.length == 0);
   };
@@ -29,18 +29,32 @@ function MeetingCard(props) {
     setShowSave(false);
   };
 
+  const contentList = useMemo(() => meetingData.content.split('-').filter(i => i.length > 1), [meetingData.content]);
+
   return (
     <div className="meetingCard">
       <p>Réunion du {meetingData.date?.toLocaleString('FR', dateFormat) ?? 'Inconnue'}</p>
-      <textarea disabled={user == null} onChange={e => onChange(e.target.value)} name="" defaultValue={meetingData.content}></textarea>
-      <div>
-        {(showSave && user != null) && (
-          <p onClick={save}>Sauvegarder</p>
-        )}
-        {(showDelete && user != null) && (
-          <p onClick={() => onDelete(meetingData)}>Supprimer</p>
-        )}
-      </div>
+      {showSave ? (
+        <textarea disabled={user == null} onChange={e => onChange(e.target.value)} name="" defaultValue={meetingData.content}></textarea>
+      ) : (
+        <ul>
+          {contentList.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      )}
+      {user != null && (
+        <div>
+          {(showSave) ? (
+            <p onClick={save}>Sauvegarder</p>
+          ) : (
+            <p onClick={() => setShowSave(true)}>Editer</p>
+          )}
+          {(showDelete) && (
+            <p onClick={() => onDelete(meetingData)}>Supprimer</p>
+          )}
+        </div>
+      )}
     </div >
   );
 }
