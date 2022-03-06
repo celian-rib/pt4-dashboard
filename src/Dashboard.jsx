@@ -52,6 +52,7 @@ function App() {
   const [weekStart, setWeekStart] = useState(undefined);
   const [weekEnd, setWeekEnd] = useState(undefined);
 
+  const [countdown, setContdown] = useState('');
 
   useEffect(() => {
     const app = initializeApp(firebaseConfig);
@@ -60,6 +61,31 @@ function App() {
     setAuth(auth);
     setDb(fbdb);
     changeWeek(0); // On start change to actual week
+  }, []);
+
+  useEffect(() => {
+    const end = new Date('2022-04-01');
+    const _second = 1000;
+    const _minute = _second * 60;
+    const _hour = _minute * 60;
+    const _day = _hour * 24;
+    const updateContdown = () => {
+      const now = new Date();
+      const distance = end - now;
+      if (distance < 0) {
+        clearInterval(interval);
+        setContdown('Terminé !');
+        return;
+      }
+      const days = Math.floor(distance / _day);
+      const hours = Math.floor((distance % _day) / _hour);
+      const minutes = Math.floor((distance % _hour) / _minute);
+
+      setContdown(`${days} jours ${hours} heures ${minutes} minutes`);
+    };
+    const interval = setTimeout(updateContdown, 60000);
+    updateContdown();
+    return () => clearInterval(interval);
   }, []);
 
   const changeWeek = (step = 0) => {
@@ -90,6 +116,7 @@ function App() {
         <p onClick={() => changeWeek(1)}>Suivante</p>
       </div>
       <h5>Du <span>{weekStart?.toLocaleDateString('FR')}</span> au <span>{weekEnd?.toLocaleDateString('FR')}</span></h5>
+      <h5>Temps restant : {countdown}</h5>
       <div className='separator'></div>
       <TeamMood weekStart={weekStart} weekEnd={weekEnd} />
       <div className='separator'></div>
